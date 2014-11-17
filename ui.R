@@ -4,13 +4,14 @@ shinyUI(fluidPage(
     titlePanel("Volcano Plot"),
     sidebarLayout(
         sidebarPanel(
-
             fileInput('file1', 'Choose CSV File',
                       accept=c('text/csv', 
                                'text/comma-separated-values,text/plain', 
                                '.csv')),
+            helpText("Note: The input file should be a ASCII text file (comma, tab, semicolon separated),
+                     containing three columns with ID, logFC and P.Value."),
             tags$p(),
-            checkboxInput('header', 'Header', TRUE),
+#             checkboxInput('header', 'Header', TRUE),
             radioButtons('sep', 'Separator',
                          c(Tab='\t',
                            Comma=',',

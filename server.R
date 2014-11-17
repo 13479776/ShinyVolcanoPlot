@@ -7,7 +7,7 @@ shinyServer(function(input, output) {
 
         dataframe <- read.csv(
             inFile$datapath, 
-            header=input$header, 
+#             header=input$header, 
             sep=input$sep,
             quote='"',
             stringsAsFactors=FALSE
