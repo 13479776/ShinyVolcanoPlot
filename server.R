@@ -34,9 +34,9 @@ shinyServer(function(input, output) {
         content = function(file) {
             dat <-  data.frame(data());
             write.csv(dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl
-                            ,c("logFC","P.Value")], 
+                            ,c("ID","logFC","P.Value")], 
                       file, 
-                      row.names=TRUE,
+                      row.names=FALSE,
                       quote=FALSE)
 
         }
@@ -45,7 +45,7 @@ shinyServer(function(input, output) {
     output$tableOut <- renderDataTable({
         dat <-  data.frame(data())
         if (is.null(input$file1)) return(NULL)
-        dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
+        dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,c("ID","logFC","P.Value")]
         
     })
        
