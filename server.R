@@ -7,7 +7,6 @@ shinyServer(function(input, output) {
 
         dataframe <- read.csv(
             inFile$datapath, 
-#             header=input$header, 
             sep=input$sep,
             quote='"',
             stringsAsFactors=FALSE
@@ -19,13 +18,16 @@ shinyServer(function(input, output) {
         dat <- data();
         plot(as.numeric(dat$logFC), -log10(as.numeric(dat$P.Value)),
              xlim=input$lfcr, ylim=range(0,input$lo),
-             xlab="log2 Fold-change", ylab="-log10(P.Value)")
+             xlab="log2(Fold-change)", ylab="-log10(P.Value)",
+             cex = 0.35, pch=16)
         abline(h=input$hl, col="red")
         abline(v=-input$vl, col="blue")
         abline(v=input$vl, col="blue")
         tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
         try(text(tmp$logFC, -log10(tmp$P.Value), tmp$ID))
     })
+
+    output$conversion <- renderPrint(10^-(input$hl))
 
     output$downloadData <- downloadHandler(
         filename = function() { 
