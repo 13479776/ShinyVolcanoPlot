@@ -1,0 +1,47 @@
+library(shiny)
+
+shinyUI(fluidPage(
+    titlePanel("Volcano Plot"),
+    sidebarLayout(
+        sidebarPanel(
+
+            fileInput('file1', 'Choose CSV File',
+                      accept=c('text/csv', 
+                               'text/comma-separated-values,text/plain', 
+                               '.csv')),
+            tags$p(),
+            checkboxInput('header', 'Header', TRUE),
+            radioButtons('sep', 'Separator',
+                         c(Tab='\t',
+                           Comma=',',
+                           Semicolon=';'
+                           ),
+                         selected=','),
+            tags$hr(),
+            h4("Axes"),
+            sliderInput("lfcr", "Log Fold-Change Range:", 
+                        -10, 10, value = c(-2, 2), 
+                        step=0.1, animate=FALSE),
+            sliderInput("lo", "-Log10 P-value:", 
+                        0, 15, value = 3, 
+                        step=0.05, animate=FALSE),
+            tags$hr(),
+            h4("Cut-offs"),
+            sliderInput("hl", "horizontal threshold", 
+                        0, 5, value = 2, 
+                        step=0.1, animate=FALSE),
+            sliderInput("vl", "vertical threshold", 
+                        0,2, value = 0.8, 
+                        step=0.1, animate=FALSE),
+            tags$hr(),
+            h4("Download Selected Genes"),
+            downloadButton('downloadData', 'Download')
+        ),
+        mainPanel(
+            tabsetPanel(type = "tabs",
+                        tabPanel("Plot", plotOutput("plot", width = "720px", height = "720px")), 
+                        tabPanel("Cut-off Selected", dataTableOutput("tableOut"))  
+            )
+        )
+    )
+))
