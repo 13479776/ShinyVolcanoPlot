@@ -18,8 +18,8 @@ shinyServer(function(input, output) {
         if (is.null(input$file1)) return(NULL)
         dat <- data();
         plot(as.numeric(dat$logFC), -log10(as.numeric(dat$P.Value)),
-             xlim=input$lfcr, ylim=range(0,input$lo), #Set limits
-             xlab="log2 Fold-change", ylab="-log10(P.Value)") #Set axis labels
+             xlim=input$lfcr, ylim=range(0,input$lo),
+             xlab="log2 Fold-change", ylab="-log10(P.Value)")
         abline(h=input$hl, col="red")
         abline(v=-input$vl, col="blue")
         abline(v=input$vl, col="blue")
@@ -46,7 +46,6 @@ shinyServer(function(input, output) {
         dat <-  data.frame(data())
         if (is.null(input$file1)) return(NULL)
         dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,c("ID","logFC","P.Value")]
-        
     })
        
 })
