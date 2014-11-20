@@ -11,7 +11,7 @@ shinyServer(function(input, output) {
             quote='"',
             stringsAsFactors=FALSE
         )
-    })    
+    })  
     
     output$plot <- renderPlot({ 
         if (is.null(input$file1)) return(NULL)
@@ -40,7 +40,6 @@ shinyServer(function(input, output) {
                       file, 
                       row.names=FALSE,
                       quote=FALSE)
-
         }
     )
     
