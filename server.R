@@ -1,20 +1,24 @@
 library(shiny)
 shinyServer(function(input, output) {
     
+    load("data/example.rda")
+    
     data <-  reactive({
         inFile <- input$file1
-        if (is.null(inFile)) return(NULL)
+#         if (is.null(inFile)) return(NULL)
+        if(is.null(inFile)) {
+            dataframe <- example
+        } else {
 
         dataframe <- read.csv(
             inFile$datapath, 
             sep=input$sep,
             quote='"',
             stringsAsFactors=FALSE
-        )
+        )}
     })  
     
     output$plot <- renderPlot({ 
-        if (is.null(input$file1)) return(NULL)
         dat <- data();
         plot(as.numeric(dat$logFC), -log10(as.numeric(dat$P.Value)),
              xlim=input$lfcr, ylim=range(0,input$lo),
@@ -45,7 +49,6 @@ shinyServer(function(input, output) {
     
     output$tableOut <- renderDataTable({
         dat <-  data.frame(data())
-        if (is.null(input$file1)) return(NULL)
         dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,c("ID","logFC","P.Value")]
     })
        

@@ -9,7 +9,7 @@ shinyUI(fluidPage(
                                'text/comma-separated-values,text/plain', 
                                '.csv')),
             helpText("Note: The input file should be a ASCII text file (comma, tab, semicolon separated),
-                     containing three columns named ID, logFC and P.Value.", tags$p(), " You can download a working example ( a .csv file) from",
+                     containing three columns named ID, logFC and P.Value.", tags$p(), " You can download the automatically loaded default example from",
                      tags$a(href="https://raw.githubusercontent.com/onertipaday/ShinyVolcanoPlot/master/data/example.csv","here"),"."),
             tags$p(),
             radioButtons('sep', 'Separator',
