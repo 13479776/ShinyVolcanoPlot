@@ -19,6 +19,8 @@ shinyUI(fluidPage(
                            ),
                          selected=','),
             tags$hr(),
+            checkboxInput("gene_names", "Show gene names", value = TRUE),
+            tags$hr(),
             h4("Axes"),
             sliderInput("lfcr", "Log2(Fold-Change) Range:", 
                         -10, 10, value = c(-2.5, 2.5), 

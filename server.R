@@ -28,7 +28,7 @@ shinyServer(function(input, output) {
         abline(v=-input$vl, col="blue")
         abline(v=input$vl, col="blue")
         tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
-        try(text(tmp$logFC, -log10(tmp$P.Value), tmp$ID))
+        if(input$gene_names) try(text(tmp$logFC, -log10(tmp$P.Value), tmp$ID))
     })
 
     output$conversion <- renderPrint(10^-(input$hl))
