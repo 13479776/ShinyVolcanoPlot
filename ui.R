@@ -1,5 +1,3 @@
-library(shiny)
-
 shinyUI(fluidPage(
     titlePanel("Volcano Plot"),
     sidebarLayout(
@@ -8,18 +6,15 @@ shinyUI(fluidPage(
                       accept=c('text/csv', 
                                'text/comma-separated-values,text/plain', 
                                '.csv')),
-            helpText("Note: The input file should be a ASCII text file (comma, tab, semicolon separated),
-                     containing three columns named ID, logFC and P.Value.", tags$p(), " You can download the automatically loaded default example from",
-                     tags$a(href="https://raw.githubusercontent.com/onertipaday/ShinyVolcanoPlot/master/data/example.csv","here"),"."),
-            tags$p(),
+            "Note: The input file should be a ASCII text file (comma, tab, semicolon separated),
+                     containing three columns named ID, logFC and P.Value, respectivelly. You can download the default example from", a(href="https://raw.githubusercontent.com/onertipaday/ShinyVolcanoPlot/master/data/example.csv","here"),".",
+            tags$hr(),
             radioButtons('sep', 'Separator',
                          c(Tab='\t',
-                           Comma=',',
-                           Semicolon=';'
+                           Comma=','
                            ),
                          selected=','),
-            tags$hr(),
-            checkboxInput("gene_names", "Show gene names", value = TRUE),
+            checkboxInput("gene_names", "Show gene names", value = FALSE),
             tags$hr(),
             h4("Axes"),
             sliderInput("lfcr", "Log2(Fold-Change) Range:", 
@@ -35,13 +30,13 @@ shinyUI(fluidPage(
             sliderInput("vl", "log2(FC) Threshold:", 
                         0,2, value = 0.8, step=0.1),
             tags$hr(),
-            h4("Download Selected Genes"),
-            downloadButton('downloadData', 'Download')
+            downloadButton('downloadData', 'Download Selected DE genes list'),
+            downloadButton('downloadPlot', 'Download Volcano Plot (PDF)')  
         ),
         mainPanel(
             tabsetPanel(type = "tabs",
-                        tabPanel("Plot", plotOutput("plot", width = "720px", height = "720px")), 
-                        tabPanel("Cut-off Selected", dataTableOutput("tableOut"))  
+                        tabPanel("ggPlot", plotOutput("ggplot", width = "720px", height = "720px")),
+                        tabPanel("Cut-off Selected", dataTableOutput("tableOut"))
             )
         )
     )
