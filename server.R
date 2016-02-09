@@ -42,7 +42,7 @@ shinyServer(function(input, output, session) {
             verbatimTextOutput('conversion')
             "sI4" = sliderInput("vl", "log2(FC) Threshold:", 
                                 0,3, value = 0.8, step=0.1)
-            return(list(rB1, cb1, sI1, sI2, sI3, sI4))
+            return(list(rB1, sI1, sI2, sI3, sI4))
         } else {
             "rB1t" = radioButtons('sep', 'Separator',
                                  c(Tab='\t',
@@ -68,7 +68,6 @@ shinyServer(function(input, output, session) {
             return(list(rB1t, cb1t, sI1t, sI2t, sI3t, sI4t))
         }
     })
-    
     
     ggplotInput <- reactive({ 
         dat <- data();
@@ -97,7 +96,6 @@ shinyServer(function(input, output, session) {
                 scale_y_continuous("-log10(P.Value)", limits = range(0,input$lo)) + theme_bw()
             
             tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
-            # tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & dat$logFC>input$vl,]
             
             q <- p + annotate("text", x=tmp$logFC, y=-log10(tmp$P.Value), 
                               label=tmp$ID, size=-log10(as.numeric(tmp$P.Value)), 
