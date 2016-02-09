@@ -1,6 +1,5 @@
 suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(shinyBS))
-suppressPackageStartupMessages(library(Cairo))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(metricsgraphics))
