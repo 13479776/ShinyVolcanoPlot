@@ -4,7 +4,6 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(metricsgraphics))
 suppressPackageStartupMessages(library(RColorBrewer))
-options(shiny.usecairo=TRUE)
 
 shinyServer(function(input, output, session) {
     
@@ -15,59 +14,106 @@ shinyServer(function(input, output, session) {
         if(is.null(inFile)) {
             dataframe <- example          
         } else {
-
-        dataframe <- read.csv(
-            inFile$datapath, 
-            sep=input$sep,
-            quote='"',
-            stringsAsFactors=FALSE
-        )}
+            
+            dataframe <- read.csv(
+                inFile$datapath, 
+                sep=input$sep,
+                quote='"',
+                stringsAsFactors=FALSE
+            )}
     })  
     
-    output$plot <- renderPlot({ 
-        dat <- data();
-        mask <-  with(dat, -log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl)
-        cols <- ifelse(mask, "red", "black")
-        plot(as.numeric(dat$logFC), -log10(as.numeric(dat$P.Value)),
-             xlim=input$lfcr, ylim=range(0,input$lo),
-             xlab="log2(Fold-change)", ylab="-log10(P.Value)",
-             cex = 0.35, pch = 16, col = cols)
-        abline(h=input$hl, col="red")
-        abline(v=-input$vl, col="blue")
-        abline(v=input$vl, col="blue")
-        tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
-        if(input$gene_names) try(text(tmp$logFC, -log10(tmp$P.Value), tmp$ID))
+    output$ui <- renderUI({
+        # Depending on input$f_test, we'll generate a different UI component and send it to the client.
+        if(input$f_test){
+            "rB1" = radioButtons('sep', 'Separator', c(Tab='\t', Comma=','), selected=',')
+            "cb1" = checkboxInput("gene_names", "Show gene names", value = FALSE)
+            tags$hr()
+            h4("Axes")
+            "sI1" = sliderInput("lfcr", "Log2(Fold-Change) Range:", 
+                                0, 10, value = c(0,3), 
+                                step=0.1, animate=FALSE)
+            "sI2" = sliderInput("lo", "-Log10(P-Value):", 
+                                0, 30, value = 25, step=0.05)
+            tags$hr()
+            h4("Cut-offs Selection")
+            "sI3" = sliderInput("hl", "P-Value Threshold:",
+                                1, 20, value = 1.30, step=0.1)
+            verbatimTextOutput('conversion')
+            "sI4" = sliderInput("vl", "log2(FC) Threshold:", 
+                                0,3, value = 0.8, step=0.1)
+            return(list(rB1, cb1, sI1, sI2, sI3, sI4))
+        } else {
+            "rB1t" = radioButtons('sep', 'Separator',
+                                 c(Tab='\t',
+                                   Comma=','
+                                 ),
+                                 selected=',')
+            "cb1t" = checkboxInput("gene_names", "Show gene names", value = FALSE)
+            tags$hr()
+            h4("Axes")
+            "sI1t" = sliderInput("lfcr", "Log2(Fold-Change) Range:", 
+                                -10, 10, value = c(-2.5, 2.5), 
+                                step=0.1, animate=FALSE)
+            "sI2t" = sliderInput("lo", "-Log10(P-Value):", 
+                                0, 15, value = 4, step=0.05)
+            tags$hr()
+            h4("Cut-offs Selection")
+            "sI3t" = sliderInput("hl", "P-Value Threshold:",
+                                1, 6, value = 1.30, step=0.1)
+            verbatimTextOutput('conversion')
+            "sI4t" = sliderInput("vl", "log2(FC) Threshold:", 
+                                0,2, value = 0.8, step=0.1)
+            tags$hr()
+            return(list(rB1t, cb1t, sI1t, sI2t, sI3t, sI4t))
+        }
     })
-
-#     output$ggplot <- renderPlot({ 
+    
+    
     ggplotInput <- reactive({ 
         dat <- data();
-        dat2 <- data.frame(x=as.numeric(dat$logFC), y=-log10(as.numeric(dat$P.Value)), ID=dat$ID)
-        p <- ggplot(dat2, aes(x, y, label= ID)) + geom_point() +
-            geom_vline(xintercept = input$vl, color = "blue") + #add vertical line
-            geom_vline(xintercept = -input$vl, color = "blue") + #add vertical line
-            geom_hline(yintercept = input$hl, color = "red") +  #add vertical line
-            labs(x="log2(Fold-change)", y="-log10(P.Value)") + 
-            scale_x_continuous("log2(Fold-change)", limits = input$lfcr) +
-            scale_y_continuous("-log10(P.Value)", limits = range(0,input$lo)) + theme_bw()
-
-        tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
-
-        q <- p + annotate("text", x=tmp$logFC, y=-log10(tmp$P.Value), 
-                          label=tmp$ID, size=-log10(as.numeric(tmp$P.Value)), 
-                          vjust=-0.1, hjust=-0.1)
-
-#         if(input$gene_names) print(q) else print(p)
+        if(input$f_test){
+            dat2 <- data.frame(x=sqrt(as.numeric(dat$logFC)), y=-log10(as.numeric(dat$P.Value)), ID=dat$ID)
+            p <- ggplot(dat2, aes(x, y, label= ID)) + geom_point() +
+                geom_vline(xintercept = input$vl, color = "blue") + #add vertical line
+                geom_vline(xintercept = -input$vl, color = "blue") + #add vertical line
+                geom_hline(yintercept = input$hl, color = "red") +  #add vertical line
+                labs(x="log2(Fold-change)", y="-log10(P.Value)") + 
+                scale_x_continuous("log2(Fold-change)", limits = input$lfcr) +
+                scale_y_continuous("-log10(P.Value)", limits = range(0,input$lo)) + theme_bw()
+#             tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & dat$logFC>input$vl,]
+#             
+#             q <- p + annotate("text", x=tmp$logFC, y=-log10(tmp$P.Value), 
+#                               label=tmp$ID, size=-log10(as.numeric(tmp$P.Value)), 
+#                               vjust=-0.1, hjust=-0.1)
+        } else {
+            dat2 <- data.frame(x=as.numeric(dat$logFC), y=-log10(as.numeric(dat$P.Value)), ID=dat$ID)
+            p <- ggplot(dat2, aes(x, y, label= ID)) + geom_point() +
+                geom_vline(xintercept = input$vl, color = "blue") + #add vertical line
+                geom_vline(xintercept = -input$vl, color = "blue") + #add vertical line
+                geom_hline(yintercept = input$hl, color = "red") +  #add vertical line
+                labs(x="log2(Fold-change)", y="-log10(P.Value)") + 
+                scale_x_continuous("log2(Fold-change)", limits = input$lfcr) +
+                scale_y_continuous("-log10(P.Value)", limits = range(0,input$lo)) + theme_bw()
+            
+            tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,]
+            # tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & dat$logFC>input$vl,]
+            
+            q <- p + annotate("text", x=tmp$logFC, y=-log10(tmp$P.Value), 
+                              label=tmp$ID, size=-log10(as.numeric(tmp$P.Value)), 
+                              vjust=-0.1, hjust=-0.1)
+        }
+        
         if(input$gene_names) q else p
     })
-
-
+    
+    
     output$ggplot <- renderPlot({
         print(ggplotInput())
     })
-
+    
     output$conversion <- renderPrint(10^-(input$hl))
-
+    
     output$downloadData <- downloadHandler(
         filename = function() { 
             paste(gsub(".csv","", input$file1), '_selected.csv', sep='') 
@@ -75,29 +121,28 @@ shinyServer(function(input, output, session) {
         content = function(file) {
             dat <-  data.frame(data());
             write.csv(dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl
-                            ,c("ID","logFC","P.Value")], 
+                          ,c("ID","logFC","P.Value")], 
                       file, 
                       row.names=FALSE,
                       quote=FALSE)
         }
     )
-
-
+    
+    
     output$downloadPlot<- downloadHandler(
         filename <- function() {
             paste(gsub(".csv","", input$file1), Sys.Date(),'.pdf',sep='')
         },
         content = function(file) {
-#           ggsave(file, plot = ggplotInput(), device = png)
             pdf(file)
             print(ggplotInput())
             dev.off()
-    }
-)
-
+        }
+    )
+    
     output$tableOut <- renderDataTable({
         dat <-  data.frame(data())
         dat[-log10(as.numeric(dat$P.Value))>input$hl & abs(dat$logFC)>input$vl,c("ID","logFC","P.Value")]
     })
-       
+    
 })
