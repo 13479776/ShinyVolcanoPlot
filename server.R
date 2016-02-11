@@ -26,9 +26,8 @@ shinyServer(function(input, output, session) {
     output$ui <- renderUI({
         # Depending on input$f_test, we'll generate a different UI component and send it to the client.
         if(input$f_test){
-            "rB1" = radioButtons('sep', 'Separator', c(Tab='\t', Comma=','), selected=',')
-            "cb1" = checkboxInput("gene_names", "Show gene names", value = FALSE)
-            tags$hr()
+            # "cb1" = checkboxInput("gene_names", "Show gene names", value = FALSE)
+            # tags$hr()
             h4("Axes")
             "sI1" = sliderInput("lfcr", "Log2(Fold-Change) Range:", 
                                 0, 10, value = c(0,3), 
@@ -39,16 +38,11 @@ shinyServer(function(input, output, session) {
             h4("Cut-offs Selection")
             "sI3" = sliderInput("hl", "P-Value Threshold:",
                                 1, 20, value = 1.30, step=0.1)
-            verbatimTextOutput('conversion')
+            "co" = verbatimTextOutput('conversion')
             "sI4" = sliderInput("vl", "log2(FC) Threshold:", 
                                 0,3, value = 0.8, step=0.1)
-            return(list(rB1, sI1, sI2, sI3, sI4))
+            return(list(sI1, sI2, sI3, co, sI4))
         } else {
-            "rB1t" = radioButtons('sep', 'Separator',
-                                 c(Tab='\t',
-                                   Comma=','
-                                 ),
-                                 selected=',')
             "cb1t" = checkboxInput("gene_names", "Show gene names", value = FALSE)
             tags$hr()
             h4("Axes")
@@ -61,11 +55,11 @@ shinyServer(function(input, output, session) {
             h4("Cut-offs Selection")
             "sI3t" = sliderInput("hl", "P-Value Threshold:",
                                 1, 6, value = 1.30, step=0.1)
-            verbatimTextOutput('conversion')
+            "co" = verbatimTextOutput('conversion')
             "sI4t" = sliderInput("vl", "log2(FC) Threshold:", 
                                 0,2, value = 0.8, step=0.1)
             tags$hr()
-            return(list(rB1t, cb1t, sI1t, sI2t, sI3t, sI4t))
+            return(list(cb1t, sI1t, sI2t, sI3t, co, sI4t))
         }
     })
     

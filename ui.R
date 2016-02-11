@@ -9,7 +9,7 @@ shinyUI(fluidPage(
             "Note: The input file should be a ASCII text file (either comma or tab separated),
                      containing three columns named ID, logFC and P.Value, respectivelly.",
             tags$hr(),
-            
+            radioButtons('sep', 'Separator', c(Tab='\t', Comma=','), selected=','),
             checkboxInput("f_test", "F-test", value = FALSE),
             tags$hr(),
             uiOutput("ui"),
