@@ -1,9 +1,5 @@
 suppressPackageStartupMessages(library(shiny))
-suppressPackageStartupMessages(library(shinyBS))
-suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(metricsgraphics))
-suppressPackageStartupMessages(library(RColorBrewer))
 
 shinyServer(function(input, output, session) {
     
@@ -26,7 +22,7 @@ shinyServer(function(input, output, session) {
     output$ui <- renderUI({
         # Depending on input$f_test, we'll generate a different UI component and send it to the client.
         if(input$f_test){
-            # "cb1" = checkboxInput("gene_names", "Show gene names", value = FALSE)
+            "cb1" = checkboxInput("gene_names", "Show gene names", value = FALSE)
             # tags$hr()
             h4("Axes")
             "sI1" = sliderInput("lfcr", "Log2(Fold-Change) Range:", 
@@ -41,7 +37,7 @@ shinyServer(function(input, output, session) {
             "co" = verbatimTextOutput('conversion')
             "sI4" = sliderInput("vl", "log2(FC) Threshold:", 
                                 0,3, value = 0.8, step=0.1)
-            return(list(sI1, sI2, sI3, co, sI4))
+            return(list(cb1, sI1, sI2, sI3, co, sI4))
         } else {
             "cb1t" = checkboxInput("gene_names", "Show gene names", value = FALSE)
             tags$hr()
@@ -69,16 +65,16 @@ shinyServer(function(input, output, session) {
             dat2 <- data.frame(x=sqrt(as.numeric(dat$logFC)), y=-log10(as.numeric(dat$P.Value)), ID=dat$ID)
             p <- ggplot(dat2, aes(x, y, label= ID)) + geom_point() +
                 geom_vline(xintercept = input$vl, color = "blue") + #add vertical line
-                geom_vline(xintercept = -input$vl, color = "blue") + #add vertical line
+                # geom_vline(xintercept = -input$vl, color = "blue") + #add vertical line
                 geom_hline(yintercept = input$hl, color = "red") +  #add vertical line
                 labs(x="log2(Fold-change)", y="-log10(P.Value)") + 
                 scale_x_continuous("log2(Fold-change)", limits = input$lfcr) +
                 scale_y_continuous("-log10(P.Value)", limits = range(0,input$lo)) + theme_bw()
-#             tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & dat$logFC>input$vl,]
-#             
-#             q <- p + annotate("text", x=tmp$logFC, y=-log10(tmp$P.Value), 
-#                               label=tmp$ID, size=-log10(as.numeric(tmp$P.Value)), 
-#                               vjust=-0.1, hjust=-0.1)
+            
+            tmp <- dat[-log10(as.numeric(dat$P.Value))>input$hl & dat$logFC>input$vl,]
+
+            q <- p + annotate("text", x=tmp$logFC, y=-log10(tmp$P.Value),
+                              label=tmp$ID, vjust=-0.1, hjust=-0.1)
         } else {
             dat2 <- data.frame(x=as.numeric(dat$logFC), y=-log10(as.numeric(dat$P.Value)), ID=dat$ID)
             p <- ggplot(dat2, aes(x, y, label= ID)) + geom_point() +
